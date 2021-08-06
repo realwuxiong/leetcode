@@ -16,7 +16,51 @@
 - [15、Boyer-Moore投票算法](#Boyer-Moore投票算法)
 - [16、计数排序](#计数排序)
 - [17、差分数组](#差分数组)
+- [18、找到最终的安全状态(DFS+三色标记法)](#找到最终的安全状态(DFS+三色标记法))
 - n皇后的题目搞一搞
+
+
+## 找到最终的安全状态(DFS+三色标记法)
+![image.png](https://note.youdao.com/yws/res/8374/WEBRESOURCE61f39a5110a714646639ba2507648971)
+```
+# 802. 找到最终的安全状态
+# https://leetcode-cn.com/problems/find-eventual-safe-states/
+
+from typing import List
+def eventualSafeNodes(graph: List[List[int]]) -> List[int]:
+    """
+    分析：有环则该节点为非安全节点，用dfs,
+    还是看的答案，
+    根据题意，若起始节点位于一个环内，或者能到达一个环，则该节点不是安全的。否则，该节点是安全的。
+
+    我们可以使用深度优先搜索来找环，并在深度优先搜索时，用三种颜色对节点进行标记，标记的规则如下：
+
+    白色（用 00 表示）：该节点尚未被访问；
+    灰色（用 11 表示）：该节点位于递归栈中，或者在某个环上；
+    黑色（用 22 表示）：该节点搜索完毕，是一个安全节点。
+    当我们首次访问一个节点时，将其标记为灰色，并继续搜索与其相连的节点。
+
+    如果在搜索过程中遇到了一个灰色节点，则说明找到了一个环，此时退出搜索，栈中的节点仍保持为灰色，这一做法可以将「找到了环」这一信息传递到栈中的所有节点上。
+
+    如果搜索过程中没有遇到灰色节点，则说明没有遇到环，那么递归返回前，我们将其标记由灰色改为黑色，即表示它是一个安全的节点。
+
+    """
+    n = len(graph)
+    visit = [0] * n
+    ans = []
+    def dfs(i):
+        if visit[i] > 0:
+            return  visit[i] == 2
+        visit[i] = 1
+        for j in graph[i]:
+            if not dfs(j):
+                return False
+        visit[i] = 2
+        return True
+    return [i for i in range(n) if dfs(i)]
+graph = [[1,2],[2,3],[5],[0],[5],[],[]]
+eventualSafeNodes(graph)
+```
 
 ## 差分数组
 看这个题
