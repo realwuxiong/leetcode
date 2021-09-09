@@ -17,8 +17,88 @@
 - [16、计数排序](#计数排序)
 - [17、差分数组](#差分数组)
 - [18、找到最终的安全状态(DFS+三色标记法)](#找到最终的安全状态(DFS+三色标记法))
+- [19、最长回文子序列](#最长回文子序列)
+- [20、用 Rand7() 实现 Rand10()](#用Rand7()实现Rand10())
+- [21、螺旋矩阵](#螺旋矩阵)
 - n皇后的题目搞一搞
 
+## 螺旋矩阵
+![](https://note.youdao.com/yws/api/personal/file/69ADBC35B4BA4E47AC3A8686ACEDE276?method=download&shareKey=aa5c0cc0495a0b1a0a78690376738660)
+
+一共两种思路，都看看
+59. 螺旋矩阵 II
+```
+# 螺旋矩阵
+n=5
+dirs = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+matrix = [[0] * n for _ in range(n)]
+row, col, dirIdx = 0, 0, 0
+for i in range(n * n):
+    matrix[row][col] = i + 1
+    dx, dy = dirs[dirIdx]
+    r, c = row + dx, col + dy
+    if r < 0 or r >= n or c < 0 or c >= n or matrix[r][c] > 0:
+        dirIdx = (dirIdx + 1) % 4   # 顺时针旋转至下一个方向
+        dx, dy = dirs[dirIdx]
+    row, col = row + dx, col + dy
+print(matrix)
+
+```
+
+![](https://note.youdao.com/yws/api/personal/file/08838DCDFBC14D3AA564F2A9E5D948E3?method=download&shareKey=9a44cd3bb95fc7da32aec1d4f4f96ca3)
+
+
+## 470. 用 Rand7()实现Rand10()
+![](https://note.youdao.com/yws/api/personal/file/EE15EA52B96C4051AF0A223DF9C2FCAB?method=download&shareKey=7b0b783892cce98f5077bcfaed06bf9a)
+```
+# 470. 用 Rand7() 实现 Rand10()
+# https://leetcode-cn.com/problems/implement-rand10-using-rand7/
+
+# The rand7() API is already defined for you.
+# def rand7():
+# @return a random integer in the range 1 to 7
+
+# 这个题目好好理解一下
+class Solution:
+    def rand10(self) -> int:
+        while True:
+            row = rand7()
+            col = rand7()
+            idx = (row - 1) * 7 + col
+            if idx <= 40:
+                return 1 + (idx - 1) % 10
+
+```
+
+
+
+## 最长回文子序列
+![image.png](https://note.youdao.com/yws/api/personal/file/WEBd67287aea2668d7d13756cd2a9a8f8e7?method=download&shareKey=3a7dfeaf6cba56e0686020ff35633cf5)
+```
+# 516. 最长回文子序列
+# https://leetcode-cn.com/problems/longest-palindromic-subsequence/
+
+# 真的是躲不掉啊，回文字符迟早要遇到。
+def longestPalindromeSubseq(s: str) -> int:
+    # 采用动态规划？？
+    n = len(s)
+    dp = [[0]*n for _ in range(n)]
+
+    #开始动态规划
+    for i in range(n - 1, -1, -1):
+        dp[i][i] = 1
+        for j in range(i+1,n):
+            if s[i] == s[j]:
+                dp[i][j] = dp[i+1][j-1]+2
+            else:
+                dp[i][j] = max(dp[i+1][j],dp[i][j-1])
+    return dp[0][n-1]
+
+
+    pass
+s = "abaa"
+longestPalindromeSubseq(s)
+```
 
 ## 找到最终的安全状态(DFS+三色标记法)
 ![image.png](https://note.youdao.com/yws/res/8374/WEBRESOURCE61f39a5110a714646639ba2507648971)
@@ -419,7 +499,96 @@ findCircleNum(isConnected)
 ```
 i 和 j 联通 那个j就是i的parent，然后find其实是一个递归函数。
 
+2、[200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)
 
+```
+# 200. 岛屿数量
+# https://leetcode-cn.com/problems/number-of-islands/
+from typing import List
+def numIslands(grid: List[List[str]]) -> int:
+    """
+    这个题目是二维的并查集,看的别人的答案
+    """
+    f = {}
+    def find(x):
+        f.setdefault(x,x)
+        if f[x]!=x:
+            f[x] = find(f[x])
+        return f[x]
+    def union(x,y):
+        f[find(y)] = find(x)
+
+    if not grid:
+        return 0
+    row,col =len(grid),len(grid[0])
+    for i in range(row):
+        for j in range(col):
+            if grid[i][j] == "1":
+                for x, y in [[-1, 0], [0, -1]]:
+                    tmp_i = i + x
+                    tmp_j = j + y
+                    if 0 <= tmp_i < row and 0 <= tmp_j < col and grid[tmp_i][tmp_j] == "1":
+                        union(tmp_i * col + tmp_j, i * col + j)
+    res = set()
+    for i in range(row):
+        for j in range(col):
+            if grid[i][j] == "1":
+                res.add(find(col*i+j))
+    return len(res)
+    pass
+grid = [
+  ["1","1","1","1","0"],
+  ["1","1","0","1","0"],
+  ["1","1","0","0","0"],
+  ["0","0","0","0","0"]
+]
+
+numIslands(grid)
+
+
+```
+3、130.被围绕的区域
+```
+# 130.被围绕的区域,看的别人的答案
+# https://leetcode-cn.com/problems/surrounded-regions/
+from typing import List
+def solve(board: List[List[str]]) -> None:
+    """
+    Do not return anything, modify board in-place instead.
+    """
+    f = {}
+    def find(x):
+        f.setdefault(x,x)
+        if f[x]!=x:
+            f[x] = find(f[x])
+        return f[x]
+    def union(x,y):
+        f[find(y)] = find(x)
+    if not board or not board[0]:
+        return
+    row,col = len(board),len(board[0])
+    dummy = row*col
+    for i in range(row):
+        for j in range(col):
+            if board[i][j] == "O":
+                if i == 0 or i == row - 1 or j == 0 or j == col - 1:
+                    union(i * col + j, dummy)
+                else:
+                    for x, y in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                        if board[i + x][j + y] == "O":
+                            union(i * col + j, (i + x) * col + (j + y))
+
+    for i in range(row):
+        for j in range(col):
+            if find(dummy) == find(i * col + j):
+                board[i][j] = "O"
+            else:
+                board[i][j] = "X"
+    print(board)
+board = [["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]
+solve(board)
+
+```
 
 ## 股票问题
 https://leetcode-cn.com/circle/article/qiAgHn/
