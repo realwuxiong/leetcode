@@ -43,6 +43,38 @@ for i in range(n * n):
     row, col = row + dx, col + dy
 print(matrix)
 
+# 885. 螺旋矩阵 III
+# https://leetcode-cn.com/problems/spiral-matrix-iii/
+
+from typing import List
+def spiralMatrixIII(rows: int, cols: int, rStart: int, cStart: int) -> List[List[int]]:
+    # Easy，一次AC。
+    step = 1
+    count = 0
+    n = rows*cols
+    ans = []
+    spiral = [(0,1),(1,0),(0,-1),(-1,0)]
+    index = 0
+    while True:
+        for a,b in spiral:
+            for i in range(step):
+                r,c =rStart,cStart
+                if -1 < r < rows and -1 < c < cols:
+                    ans.append([r,c])
+                    count += 1
+                if count == n:
+                    return ans
+                rStart,cStart=r+a,c+b
+            index += 1
+            if index % 2 == 0:
+                step += 1
+
+R = 5
+C = 6
+r0 = 1
+c0 = 4
+spiralMatrixIII(R,C,r0,c0)
+
 ```
 
 ![](https://note.youdao.com/yws/api/personal/file/08838DCDFBC14D3AA564F2A9E5D948E3?method=download&shareKey=9a44cd3bb95fc7da32aec1d4f4f96ca3)
